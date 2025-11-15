@@ -1,9 +1,9 @@
 from fastapi import HTTPException
-from api.schemas.signal_request import SignalRequest
-from api.schemas.signal_response import SignalResponse
-from domain.services.signal_service import SignalService
-from core.exceptions import NoDataError, ExchangeError, InvalidSymbolError
-from infrastructure.logging.logger import get_logger
+from market_signal_service.api.schemas.signal_request import SignalRequest
+from market_signal_service.api.schemas.signal_response import SignalResponse
+from market_signal_service.domain.services.signal_service import SignalService
+from market_signal_service.core.exceptions import NoDataError, ExchangeError, InvalidSymbolError
+from market_signal_service.infrastructure.logging.logger import get_logger
 
 logger = get_logger(__name__)
 

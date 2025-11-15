@@ -1,7 +1,6 @@
 from pydantic import BaseModel, validator
 from typing import Optional
-from core.timeframes import VALID_TIMEFRAMES
-
+from market_signal_service.core.timeframes import VALID_TIMEFRAMES
 class SignalRequest(BaseModel):
     symbol: str
     timeframe: str = "1h"

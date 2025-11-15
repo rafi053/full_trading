@@ -1,6 +1,6 @@
 import pandas as pd
-from domain.engine.indicators.ma_indicator import MAIndicator
-from domain.engine.indicators.ema_indicator import EMAIndicator
+from market_signal_service.domain.engine.indicators.ma_indicator import MAIndicator
+from market_signal_service.domain.engine.indicators.ema_indicator import EMAIndicator
 
 class TrendDetector:
     @staticmethod

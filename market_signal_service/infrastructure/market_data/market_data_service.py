@@ -1,11 +1,11 @@
 import pandas as pd
-from infrastructure.market_data.binance_client import BinanceClient
-from infrastructure.market_data.bybit_client import BybitClient
-from infrastructure.market_data.kucoin_client import KuCoinClient
-from infrastructure.cache.cache_service import CacheService
-from core.exceptions import InvalidSymbolError
-from core.timeframes import normalize_timeframe
-from infrastructure.logging.logger import get_logger
+from market_signal_service.infrastructure.market_data.binance_client import BinanceClient
+from market_signal_service.infrastructure.market_data.bybit_client import BybitClient
+from market_signal_service.infrastructure.market_data.kucoin_client import KuCoinClient
+from market_signal_service.infrastructure.cache.cache_service import CacheService
+from market_signal_service.core.exceptions import InvalidSymbolError
+from market_signal_service.core.timeframes import normalize_timeframe
+from market_signal_service.infrastructure.logging.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -1,8 +1,8 @@
 import requests
 import pandas as pd
 from typing import List
-from core.exceptions import ExchangeError, NoDataError
-from infrastructure.logging.logger import get_logger
+from market_signal_service.core.exceptions import ExchangeError, NoDataError
+from market_signal_service.infrastructure.logging.logger import get_logger
 
 logger = get_logger(__name__)
 

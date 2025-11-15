@@ -19,7 +19,7 @@ app.add_middleware(
 
 app.include_router(
     signal_routes.router, 
-    prefix="/api/v1/signals",
+    prefix="/api",
     tags=["Market Signals"]
 )
 
@@ -29,8 +29,8 @@ async def root():
         "message": "Full Trading Platform API",
         "version": "1.0.0",
         "services": {
-            "signals": "/api/v1/signals",
-            "bots": "/api/v1/bots (coming soon)",
+            "signal": "/api/signal",
+            "bots": "/api/bots (coming soon)",
             "docs": "/docs",
             "health": "/health"
         }

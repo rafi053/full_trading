@@ -1,7 +1,7 @@
-from infrastructure.market_data.market_data_service import MarketDataService
-from domain.engine.decision.decision_engine import DecisionEngine
-from domain.models.signal_result import SignalResult
-from infrastructure.logging.logger import get_logger
+from market_signal_service.infrastructure.market_data.market_data_service import MarketDataService
+from market_signal_service.domain.engine.decision.decision_engine import DecisionEngine
+from market_signal_service.domain.models.signal_result import SignalResult
+from market_signal_service.infrastructure.logging.logger import get_logger
 
 logger = get_logger(__name__)
 

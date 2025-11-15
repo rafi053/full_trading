@@ -1,6 +1,5 @@
 from fastapi import APIRouter
-from api.controllers.signal_controller import SignalController
-
+from market_signal_service.api.controllers.signal_controller import SignalController
 router = APIRouter(tags=["signals"])
 
 signal_controller = SignalController()

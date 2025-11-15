@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import numpy as np
-from domain.engine.decision.decision_engine import DecisionEngine
+from market_signal_service.domain.engine.decision.decision_engine import DecisionEngine
 
 @pytest.fixture
 def sample_data():

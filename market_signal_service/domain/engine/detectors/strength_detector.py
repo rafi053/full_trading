@@ -1,5 +1,5 @@
 import pandas as pd
-from domain.engine.indicators.adx_indicator import ADXIndicator
+from market_signal_service.domain.engine.indicators.adx_indicator import ADXIndicator
 
 class StrengthDetector:
     @staticmethod

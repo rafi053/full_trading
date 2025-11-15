@@ -1,12 +1,12 @@
 import pytest
 import pandas as pd
 import numpy as np
-from domain.engine.indicators.ma_indicator import MAIndicator
-from domain.engine.indicators.ema_indicator import EMAIndicator
-from domain.engine.indicators.rsi_indicator import RSIIndicator
-from domain.engine.indicators.macd_indicator import MACDIndicator
-from domain.engine.indicators.stochastic_indicator import StochasticIndicator
-from domain.engine.indicators.adx_indicator import ADXIndicator
+from market_signal_service.domain.engine.indicators.ma_indicator import MAIndicator
+from market_signal_service.domain.engine.indicators.ema_indicator import EMAIndicator
+from market_signal_service.domain.engine.indicators.rsi_indicator import RSIIndicator
+from market_signal_service.domain.engine.indicators.macd_indicator import MACDIndicator
+from market_signal_service.domain.engine.indicators.stochastic_indicator import StochasticIndicator
+from market_signal_service.domain.engine.indicators.adx_indicator import ADXIndicator
 
 @pytest.fixture
 def sample_data():

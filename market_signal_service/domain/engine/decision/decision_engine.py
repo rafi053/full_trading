@@ -1,13 +1,13 @@
 import pandas as pd
 from datetime import datetime
-from domain.engine.detectors.trend_detector import TrendDetector
-from domain.engine.detectors.momentum_detector import MomentumDetector
-from domain.engine.detectors.strength_detector import StrengthDetector
-from domain.engine.detectors.structure_detector import StructureDetector
-from domain.engine.scoring.scoring_engine import ScoringEngine
-from domain.models.signal_result import SignalResult
-from core.normalize import score_to_signal, score_to_strength_percent
-from core.thresholds import BUY_THRESHOLD, SELL_THRESHOLD
+from market_signal_service.domain.engine.detectors.trend_detector import TrendDetector
+from market_signal_service.domain.engine.detectors.momentum_detector import MomentumDetector
+from market_signal_service.domain.engine.detectors.strength_detector import StrengthDetector
+from market_signal_service.domain.engine.detectors.structure_detector import StructureDetector
+from market_signal_service.domain.engine.scoring.scoring_engine import ScoringEngine
+from market_signal_service.domain.models.signal_result import SignalResult
+from market_signal_service.core.normalize import score_to_signal, score_to_strength_percent
+from market_signal_service.core.thresholds import BUY_THRESHOLD, SELL_THRESHOLD
 
 class DecisionEngine:
     def __init__(self):

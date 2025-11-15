@@ -1,7 +1,7 @@
 import pandas as pd
-from domain.engine.indicators.rsi_indicator import RSIIndicator
-from domain.engine.indicators.macd_indicator import MACDIndicator
-from domain.engine.indicators.stochastic_indicator import StochasticIndicator
+from market_signal_service.domain.engine.indicators.rsi_indicator import RSIIndicator
+from market_signal_service.domain.engine.indicators.macd_indicator import MACDIndicator
+from market_signal_service.domain.engine.indicators.stochastic_indicator import StochasticIndicator
 
 class MomentumDetector:
     @staticmethod

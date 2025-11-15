@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from domain.engine.indicators.ema_indicator import EMAIndicator
+from market_signal_service.domain.engine.indicators.ema_indicator import EMAIndicator
 
 class MACDIndicator:
     @staticmethod

@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock, patch
 import pandas as pd
 import numpy as np
-from domain.services.signal_service import SignalService
+from market_signal_service.domain.services.signal_service import SignalService
 
 @pytest.fixture
 def mock_market_data():

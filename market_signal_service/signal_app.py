@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import signal_routes
-from infrastructure.config.settings import Settings
-from infrastructure.logging.logger import setup_logger
+from market_signal_service.api.routes import signal_routes
+from market_signal_service.infrastructure.config.settings import Settings
+from market_signal_service.infrastructure.logging.logger import setup_logger
 
 settings = Settings()
 logger = setup_logger()

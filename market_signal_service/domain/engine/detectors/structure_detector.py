@@ -1,5 +1,5 @@
 import pandas as pd
-from domain.engine.indicators.market_structure_indicator import MarketStructureIndicator
+from market_signal_service.domain.engine.indicators.market_structure_indicator import MarketStructureIndicator
 
 class StructureDetector:
     @staticmethod
