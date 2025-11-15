@@ -4,15 +4,46 @@ from core import indicators, position_tracker
 
 class ShortRipBot(BaseBot):
     
+    def __init__(self, config, exchange_client, config_path, logger):
+        super().__init__(config, exchange_client, config_path, logger)
+        self.price_history = []
+        self.current_atr = None
+    
     def check_entry_signal(self, current_price: float, prev_price: float):
-        is_rip, rise = indicators.detect_rip(current_price, prev_price, self.config.sell_threshold)
+        self.price_history.append(current_price)
+        if len(self.price_history) > self.config.atr_period + 1:
+            self.price_history.pop(0)
         
-        if is_rip:
-            self.log.warning(
-                f"SELL SIGNAL: Rise {rise*100:.4f}% | "
-                f"From ${prev_price:.4f} to ${current_price:.4f}"
+        if self.config.use_atr and len(self.price_history) >= self.config.atr_period + 1:
+            self.current_atr = indicators.calculate_atr(
+                self.price_history, 
+                self.config.atr_period
             )
-            self.execute_entry(current_price)
+            
+            is_rip, price_rise = indicators.detect_rip_with_atr(
+                current_price=current_price,
+                prev_price=prev_price,
+                atr=self.current_atr,
+                k_factor=self.config.atr_multiplier
+            )
+            
+            if is_rip:
+                self.log.warning(
+                    f"SELL SIGNAL (ATR): Rise ${price_rise:.2f} | "
+                    f"ATR: ${self.current_atr:.2f} | "
+                    f"Threshold: ${self.config.atr_multiplier * self.current_atr:.2f} | "
+                    f"From ${prev_price:.4f} to ${current_price:.4f}"
+                )
+                self.execute_entry(current_price)
+        else:
+            is_rip, rise = indicators.detect_rip(current_price, prev_price, self.config.sell_threshold)
+            
+            if is_rip:
+                self.log.warning(
+                    f"SELL SIGNAL (Percentage): Rise {rise*100:.4f}% | "
+                    f"From ${prev_price:.4f} to ${current_price:.4f}"
+                )
+                self.execute_entry(current_price)
     
     def execute_entry(self, current_price: float):
         current_position_size = self.calculate_current_position_size()

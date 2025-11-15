@@ -1,5 +1,5 @@
 {
-  "botId": "long_bot_001",
+  "botId": "short_bot_atr_001",
   "userId": "user_123",
   "clientName": "Client A",
   "credentials": {
@@ -9,16 +9,16 @@
   "tradingParams": {
     "symbol": "BTCUSDT",
     "quantity": 0.01,
-    "tradingMode": "LONG",
+    "tradingMode": "SHORT",
     "desiredPositionSize": 1000
   },
   "thresholds": {
-    "buyThreshold": 0.005,
-    "sellThreshold": 0.008,
+    "buyThreshold": 0.008,
+    "sellThreshold": 0.005,
     "maxTradesPerMinute": 3,
     "positionSizeLimit": 5000,
-    "sellPercentage": 1.0,
-    "useATR": false,
+    "buyPercentage": 1.0,
+    "useATR": true,
     "atrPeriod": 14,
     "atrMultiplier": 0.7
   },
