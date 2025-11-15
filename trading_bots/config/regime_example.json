@@ -1,0 +1,9 @@
+{
+  "regime": {
+    "manual_regime": "UPTREND",
+    "check_interval_seconds": 300,
+    "enabled": false
+  },
+  "long_bot_config": "config/bot_long_example.json",
+  "short_bot_config": "config/bot_short_example.json"
+}

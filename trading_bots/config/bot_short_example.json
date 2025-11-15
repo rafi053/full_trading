@@ -1,0 +1,41 @@
+{
+  "botId": "short_bot_001",
+  "userId": "user_123",
+  "clientName": "Client A",
+  "credentials": {
+    "apiKey": "YOUR_API_KEY_HERE",
+    "apiSecret": "YOUR_API_SECRET_HERE"
+  },
+  "tradingParams": {
+    "symbol": "BTCUSDT",
+    "quantity": 0.01,
+    "tradingMode": "SHORT",
+    "desiredPositionSize": 1000
+  },
+  "thresholds": {
+    "buyThreshold": 0.008,
+    "sellThreshold": 0.005,
+    "maxTradesPerMinute": 3,
+    "positionSizeLimit": 5000,
+    "buyPercentage": 1.0
+  },
+  "takeProfit": {
+    "enabled": false,
+    "priceLevel": null
+  },
+  "stopLoss": {
+    "enabled": false,
+    "priceLevel": null,
+    "botStopLoss": -100
+  },
+  "fees": {
+    "buy": 0.0006,
+    "sell": 0.0006
+  },
+  "status": {
+    "enabled": true,
+    "startedAt": null,
+    "stoppedAt": null,
+    "totalRealizedPnl": 0
+  }
+}
