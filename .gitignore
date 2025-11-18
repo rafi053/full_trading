@@ -39,3 +39,4 @@ ENV/
 *.swp
 *.swo
 myenv
+logs/

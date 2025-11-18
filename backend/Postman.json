@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "R3 API (Validated)",
+    "_postman_id": "c33b9b84-7e32-4f69-96a2-5c819c2c8b02",
+    "description": "Validated API collection for Bots, Positions, Trades, and Stats, aligned with Zod schemas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "🧠 Bots",
+      "item": [
+        {
+          "name": "Get All Bots",
+          "request": { "method": "GET", "url": "{{base_url}}/api/bots" }
+        },
+        {
+          "name": "Get Bot by ID",
+          "request": { "method": "GET", "url": "{{base_url}}/api/bots/674fc2349a12ef1b3b000001" }
+        },
+        {
+          "name": "Create Bot",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"RangeBot Alpha\",\n  \"type\": \"RANGE\",\n  \"exchange\": \"bybit\",\n  \"config\": {\n    \"exchange\": \"bybit\",\n    \"symbol\": \"BTCUSDT\",\n    \"leverage\": 10,\n    \"positionSize\": 0.05,\n    \"strategy\": { \"gridSpacing\": 100 },\n    \"riskManagement\": {\n      \"maxDailyLoss\": 200,\n      \"maxOpenPositions\": 3,\n      \"stopLossPercent\": 2,\n      \"takeProfitPercent\": 5\n    }\n  }\n}"
+            },
+            "url": "{{base_url}}/api/bots"
+          }
+        },
+        {
+          "name": "Update Bot",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"RangeBot Alpha Updated\",\n  \"status\": \"RUNNING\",\n  \"config\": {\n    \"exchange\": \"bybit\",\n    \"symbol\": \"BTCUSDT\",\n    \"leverage\": 15,\n    \"positionSize\": 0.08,\n    \"strategy\": { \"gridSpacing\": 80 },\n    \"riskManagement\": {\n      \"maxDailyLoss\": 250,\n      \"maxOpenPositions\": 4,\n      \"stopLossPercent\": 1.5,\n      \"takeProfitPercent\": 4.5\n    }\n  }\n}"
+            },
+            "url": "{{base_url}}/api/bots/674fc2349a12ef1b3b000001"
+          }
+        },
+        {
+          "name": "Delete Bot",
+          "request": { "method": "DELETE", "url": "{{base_url}}/api/bots/674fc2349a12ef1b3b000001" }
+        }
+      ]
+    },
+    {
+      "name": "📈 Positions",
+      "item": [
+        { "name": "Get All Positions", "request": { "method": "GET", "url": "{{base_url}}/api/positions" } },
+        {
+          "name": "Create Position",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"botId\": \"674fc2349a12ef1b3b000001\",\n  \"exchange\": \"bybit\",\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"LONG\",\n  \"entryPrice\": 45000,\n  \"currentPrice\": 45150,\n  \"liquidationPrice\": 40000,\n  \"quantity\": 0.1,\n  \"leverage\": 10,\n  \"margin\": 450,\n  \"takeProfit\": 48000,\n  \"stopLoss\": 44000\n}"
+            },
+            "url": "{{base_url}}/api/positions"
+          }
+        },
+        {
+          "name": "Update Position",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPrice\": 45500,\n  \"unrealizedPnL\": 50,\n  \"takeProfit\": 48500,\n  \"stopLoss\": 44500,\n  \"fees\": 5,\n  \"fundingFees\": 0.5\n}"
+            },
+            "url": "{{base_url}}/api/positions/674fc2349a12ef1b3b000002"
+          }
+        },
+        {
+          "name": "Close Position",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"closePrice\": 46000,\n  \"reason\": \"manual close\"\n}"
+            },
+            "url": "{{base_url}}/api/positions/674fc2349a12ef1b3b000002/close"
+          }
+        }
+      ]
+    },
+    {
+      "name": "💹 Trades",
+      "item": [
+        { "name": "Get All Trades", "request": { "method": "GET", "url": "{{base_url}}/api/trades" } },
+        {
+          "name": "Create Trade",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"botId\": \"674fc2349a12ef1b3b000001\",\n  \"positionId\": \"674fc2349a12ef1b3b000002\",\n  \"exchange\": \"bybit\",\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"BUY\",\n  \"entryPrice\": 45000,\n  \"quantity\": 0.1,\n  \"leverage\": 10\n}"
+            },
+            "url": "{{base_url}}/api/trades"
+          }
+        },
+        {
+          "name": "Update Trade",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exitPrice\": 46000,\n  \"pnl\": 100,\n  \"pnlPercent\": 2.5,\n  \"fees\": 4,\n  \"fundingFees\": 0.3,\n  \"metadata\": {\"note\": \"take profit triggered\"}\n}"
+            },
+            "url": "{{base_url}}/api/trades/674fc2349a12ef1b3b000003"
+          }
+        },
+        {
+          "name": "Close Trade",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exitPrice\": 47000,\n  \"closeReason\": \"TAKE_PROFIT\",\n  \"fees\": 4.5,\n  \"fundingFees\": 0.2\n}"
+            },
+            "url": "{{base_url}}/api/trades/674fc2349a12ef1b3b000003/close"
+          }
+        },
+        {
+          "name": "Delete Trade",
+          "request": { "method": "DELETE", "url": "{{base_url}}/api/trades/674fc2349a12ef1b3b000003" }
+        }
+      ]
+    },
+    {
+      "name": "📊 Stats",
+      "item": [
+        { "name": "Global Stats", "request": { "method": "GET", "url": "{{base_url}}/api/stats/global?timeframe=month" } },
+        { "name": "PnL History", "request": { "method": "GET", "url": "{{base_url}}/api/stats/pnl-history?timeframe=month&interval=day" } },
+        { "name": "Winrate History", "request": { "method": "GET", "url": "{{base_url}}/api/stats/winrate-history?timeframe=month&interval=day" } },
+        { "name": "Best Trades", "request": { "method": "GET", "url": "{{base_url}}/api/stats/best-trades?limit=10" } },
+        { "name": "Worst Trades", "request": { "method": "GET", "url": "{{base_url}}/api/stats/worst-trades?limit=10" } },
+        { "name": "Stats by Bot", "request": { "method": "GET", "url": "{{base_url}}/api/stats/bot/674fc2349a12ef1b3b000001?timeframe=month" } }
+      ]
+    },
+    {
+      "name": "🩺 Health",
+      "item": [
+        { "name": "isAlive", "request": { "method": "GET", "url": "{{base_url}}/isAlive" } },
+        { "name": "isalive (alt)", "request": { "method": "GET", "url": "{{base_url}}/isalive" } },
+        { "name": "health (alt)", "request": { "method": "GET", "url": "{{base_url}}/health" } }
+      ]
+    }
+  ]
+}
