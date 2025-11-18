@@ -63,6 +63,7 @@ export class BotManager {
     static updateOne = async (botId: string, update: Partial<Bot>) => {
         return BotModel.findByIdAndUpdate(botId, update, { new: true }).orFail(new DocumentNotFoundError(botId)).lean().exec();
     };
+
     static deleteOne = async (botId: string) => {
         const bot = await BotModel.findById(botId).orFail(new DocumentNotFoundError(botId));
 
@@ -88,6 +89,15 @@ export class BotManager {
         bot.lastStartedAt = new Date();
         await bot.save();
 
+        try {
+            const { PythonBotService } = await import('../../services/python-bot-service');
+            await PythonBotService.startBot(botId);
+        } catch (error: any) {
+            bot.status = BotStatus.STOPPED;
+            await bot.save();
+            throw new Error(`Failed to start bot in Python: ${error.message}`);
+        }
+
         WebSocketServer.getInstance().emitToBots(WebSocketEvent.BOT_STATUS_CHANGED, {
             botId: bot._id,
             name: bot.name,
@@ -103,6 +113,13 @@ export class BotManager {
 
         if (bot.status === BotStatus.STOPPED) {
             throw new Error('Bot is already stopped');
+        }
+
+        try {
+            const { PythonBotService } = await import('../../services/python-bot-service');
+            await PythonBotService.stopBot(botId);
+        } catch (error: any) {
+            console.error(`Failed to stop bot in Python: ${error.message}`);
         }
 
         bot.status = BotStatus.STOPPED;

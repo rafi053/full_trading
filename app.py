@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from market_signal_service.api.routes import signal_routes
 from trading_bots.api.routes import bot_routes
-
 app = FastAPI(
     title="Full Trading Platform",
     description="Market Signals + Trading Bots Management",

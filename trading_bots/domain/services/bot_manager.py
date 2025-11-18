@@ -1,33 +1,62 @@
 import threading
 import uuid
+import os
 from typing import Dict, Optional, List
 from datetime import datetime
-import os
 from dotenv import load_dotenv
+from bson import ObjectId
+
+from trading_bots.infrastructure.database import get_sync_db
 
 load_dotenv()
 
 class BotManager:
     def __init__(self):
-        self.active_bots: Dict[str, dict] = {}
+        self.db = get_sync_db()
+        self.bots_collection = self.db['bots']
+        self.active_threads: Dict[str, threading.Thread] = {}
         self.enable_real_trading = os.getenv('ENABLE_REAL_TRADING', 'false').lower() == 'true'
+    
+    def start_bot(self, bot_id: str) -> dict:
+        print(f"DEBUG: Searching for bot_id: {bot_id}")
+        print(f"DEBUG: Database name: {self.db.name}")
+        print(f"DEBUG: Collection name: {self.bots_collection.name}")
         
-    def start_bot(self, bot_type: str, symbol: str, config: dict) -> str:
-        bot_id = str(uuid.uuid4())
+        bot = self.bots_collection.find_one({"_id": ObjectId(bot_id)})
+        print(f"DEBUG: Found bot: {bot}")
+        
+        if not bot:
+            raise ValueError(f"Bot {bot_id} not found in MongoDB")
+        
+        if bot.get('status') == 'RUNNING':
+            raise ValueError(f"Bot {bot_id} is already running")
+        
+        self.bots_collection.update_one(
+            {"_id": ObjectId(bot_id)},
+            {
+                "$set": {
+                    "status": "STARTING",
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
         
         if not self.enable_real_trading:
-            bot_info = {
-                "id": bot_id,
-                "type": bot_type,
-                "symbol": symbol,
-                "config": config,
-                "status": "running (DEMO)",
-                "started_at": datetime.utcnow().isoformat(),
-                "thread": None,
-                "bot_instance": None
+            self.bots_collection.update_one(
+                {"_id": ObjectId(bot_id)},
+                {
+                    "$set": {
+                        "status": "RUNNING (DEMO)",
+                        "started_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
+                    }
+                }
+            )
+            return {
+                "bot_id": bot_id,
+                "status": "RUNNING (DEMO)",
+                "message": "Demo mode - no real trading"
             }
-            self.active_bots[bot_id] = bot_info
-            return bot_id
         
         try:
             from trading_bots.bots.long_dip_bot import LongDipBot
@@ -40,142 +69,207 @@ class BotManager:
             api_secret = os.getenv('BITUNIX_API_SECRET')
             
             if not api_key or not api_secret:
-                raise ValueError("BITUNIX_API_KEY and BITUNIX_API_SECRET must be set in .env file")
+                raise ValueError("BITUNIX_API_KEY and BITUNIX_API_SECRET required")
             
-            max_position = int(os.getenv('MAX_POSITION_SIZE', 100))
-            if config.get('position_size', 0) > max_position:
-                raise ValueError(f"Position size exceeds maximum: {max_position}")
-            
-            config_dict = {
-                'botId': bot_id,
-                'userId': 'api_user',
-                'clientName': 'API',
-                'credentials': {
-                    'apiKey': api_key,
-                    'apiSecret': api_secret
-                },
-                'tradingParams': {
-                    'symbol': symbol,
-                    'quantity': config.get('position_size', 100),
-                    'tradingMode': 'linear',
-                    'desiredPositionSize': config.get('position_size', 100)
-                },
-                'thresholds': {
-                    'buyThreshold': config.get('dip_threshold', -2.0) / 100,
-                    'sellThreshold': config.get('take_profit_pct', 2.0) / 100,
-                    'maxTradesPerMinute': 5,
-                    'positionSizeLimit': config.get('position_size', 100) * 10,
-                    'buyPercentage': 1.0,
-                    'sellPercentage': 1.0,
-                    'useATR': config.get('use_atr', False),
-                    'atrPeriod': 14,
-                    'atrMultiplier': 1.5
-                },
-                'takeProfit': {
-                    'enabled': False,
-                    'priceLevel': None
-                },
-                'stopLoss': {
-                    'enabled': False,
-                    'priceLevel': None,
-                    'botStopLoss': config.get('bot_stop_loss', None)
-                },
-                'fees': {
-                    'buy': 0.0006,
-                    'sell': 0.0006
-                }
-            }
-            
+            config_dict = self._build_config_from_mongo_bot(bot, api_key, api_secret)
             bot_config = BotConfig(config_dict)
             
-            exchange_client = BitunixClient(
-                api_key=api_key,
-                api_secret=api_secret
-            )
-            
+            exchange_client = BitunixClient(api_key=api_key, api_secret=api_secret)
             logger = setup_logger(bot_id)
             
             os.makedirs('temp', exist_ok=True)
             config_path = f"temp/bot_{bot_id}.json"
             
-            if bot_type == "long_dip":
+            bot_type = bot.get('type', 'TREND_LONG')
+            if bot_type == "TREND_LONG" or bot_type == "LONG":
                 bot_instance = LongDipBot(bot_config, exchange_client, config_path, logger)
-            elif bot_type == "short_rip":
+            elif bot_type == "TREND_SHORT" or bot_type == "SHORT":
                 bot_instance = ShortRipBot(bot_config, exchange_client, config_path, logger)
+            elif bot_type == "RANGE":
+                raise ValueError("RANGE bot type is not yet supported")
             else:
-                raise ValueError(f"Unknown bot type: {bot_type}")
+                raise ValueError(f"Unknown bot type: {bot_type}")   
             
             thread = threading.Thread(
                 target=bot_instance.run,
-                daemon=True,
+                daemon=False,
                 name=f"bot_{bot_id}"
             )
             thread.start()
             
-            bot_info = {
-                "id": bot_id,
-                "type": bot_type,
-                "symbol": symbol,
-                "config": config,
-                "status": "running (LIVE)",
-                "started_at": datetime.utcnow().isoformat(),
-                "thread": thread,
-                "bot_instance": bot_instance
+            self.active_threads[bot_id] = thread
+            
+            self.bots_collection.update_one(
+                {"_id": ObjectId(bot_id)},
+                {
+                    "$set": {
+                        "status": "RUNNING",
+                        "started_at": datetime.utcnow(),
+                        "process_id": os.getpid(),
+                        "last_heartbeat": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
+                    }
+                }
+            )
+            
+            return {
+                "bot_id": bot_id,
+                "status": "RUNNING",
+                "message": f"Bot started successfully"
             }
             
-            self.active_bots[bot_id] = bot_info
-            return bot_id
-            
         except Exception as e:
+            self.bots_collection.update_one(
+                {"_id": ObjectId(bot_id)},
+                {
+                    "$set": {
+                        "status": "ERROR",
+                        "error": str(e),
+                        "updated_at": datetime.utcnow()
+                    }
+                }
+            )
             raise Exception(f"Failed to start bot: {str(e)}")
     
-    def stop_bot(self, bot_id: str) -> bool:
-        if bot_id not in self.active_bots:
-            return False
-        
-        bot_info = self.active_bots[bot_id]
-        
-        if bot_info.get("bot_instance"):
-            try:
-                bot_info["bot_instance"].stop()
-            except Exception as e:
-                print(f"Error stopping bot: {e}")
-        
-        bot_info["status"] = "stopped"
-        bot_info["stopped_at"] = datetime.utcnow().isoformat()
-        
-        return True
-    
-    def get_bot_status(self, bot_id: str) -> Optional[dict]:
-        if bot_id not in self.active_bots:
-            return None
-        
-        bot_info = self.active_bots[bot_id]
-        
-        is_alive = False
-        if bot_info.get("thread"):
-            is_alive = bot_info["thread"].is_alive()
+    def _build_config_from_mongo_bot(self, bot: dict, api_key: str, api_secret: str) -> dict:
+        config = bot.get('config', {})
         
         return {
-            "bot_id": bot_info["id"],
-            "type": bot_info["type"],
-            "symbol": bot_info["symbol"],
-            "status": bot_info["status"],
-            "thread_alive": is_alive,
-            "started_at": bot_info.get("started_at", ""),
-            "stopped_at": bot_info.get("stopped_at", "")
+            'botId': str(bot['_id']),
+            'userId': 'api_user',
+            'clientName': 'API',
+            'credentials': {
+                'apiKey': api_key,
+                'apiSecret': api_secret
+            },
+            'tradingParams': {
+                'symbol': config.get('symbol', 'BTCUSDT'),
+                'quantity': config.get('positionSize', 100),
+                'tradingMode': 'linear',
+                'desiredPositionSize': config.get('positionSize', 100)
+            },
+            'thresholds': {
+                'buyThreshold': config.get('strategy', {}).get('buyThreshold', -0.02),
+                'sellThreshold': config.get('strategy', {}).get('sellThreshold', 0.015),
+                'maxTradesPerMinute': config.get('riskManagement', {}).get('maxTradesPerMinute', 5),
+                'positionSizeLimit': config.get('riskManagement', {}).get('positionSizeLimit', 1000),
+                'buyPercentage': 1.0,
+                'sellPercentage': 1.0,
+                'useATR': config.get('strategy', {}).get('useATR', False),
+                'atrPeriod': 14,
+                'atrMultiplier': 1.5
+            },
+            'takeProfit': {
+                'enabled': False,
+                'priceLevel': None
+            },
+            'stopLoss': {
+                'enabled': config.get('riskManagement', {}).get('stopLoss', {}).get('enabled', False),
+                'priceLevel': config.get('riskManagement', {}).get('stopLoss', {}).get('price', None),
+                'botStopLoss': config.get('riskManagement', {}).get('botStopLoss', None)
+            },
+            'fees': {
+                'buy': 0.0006,
+                'sell': 0.0006
+            }
         }
     
+    def stop_bot(self, bot_id: str) -> bool:
+        try:
+            bot = self.bots_collection.find_one({"_id": ObjectId(bot_id)})
+            
+            if not bot:
+                return False
+            
+            self.bots_collection.update_one(
+                {"_id": ObjectId(bot_id)},
+                {
+                    "$set": {
+                        "status": "STOPPED",
+                        "stopped_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
+                    }
+                }
+            )
+            
+            if bot_id in self.active_threads:
+                thread = self.active_threads[bot_id]
+                del self.active_threads[bot_id]
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error stopping bot: {e}")
+            return False
+    
+    def get_bot_status(self, bot_id: str) -> Optional[dict]:
+        try:
+            bot = self.bots_collection.find_one({"_id": ObjectId(bot_id)})
+            
+            if not bot:
+                return None
+            
+            is_alive = False
+            if bot_id in self.active_threads:
+                is_alive = self.active_threads[bot_id].is_alive()
+            
+            return {
+                "bot_id": str(bot['_id']),
+                "name": bot.get('name', ''),
+                "type": bot.get('type', ''),
+                "symbol": bot.get('config', {}).get('symbol', ''),
+                "status": bot.get('status', ''),
+                "thread_alive": is_alive,
+                "started_at": bot.get('started_at', '').isoformat() if bot.get('started_at') else '',
+                "stopped_at": bot.get('stopped_at', '').isoformat() if bot.get('stopped_at') else ''
+            }
+            
+        except Exception as e:
+            print(f"Error getting bot status: {e}")
+            return None
+    
     def get_all_bots(self) -> List[dict]:
-        return [
-            self.get_bot_status(bot_id)
-            for bot_id in self.active_bots.keys()
-        ]
+        try:
+            bots = list(self.bots_collection.find())
+            
+            result = []
+            for bot in bots:
+                bot_id = str(bot['_id'])
+                is_alive = False
+                if bot_id in self.active_threads:
+                    is_alive = self.active_threads[bot_id].is_alive()
+                
+                result.append({
+                    "bot_id": bot_id,
+                    "name": bot.get('name', ''),
+                    "type": bot.get('type', ''),
+                    "symbol": bot.get('config', {}).get('symbol', ''),
+                    "status": bot.get('status', ''),
+                    "thread_alive": is_alive,
+                    "started_at": bot.get('started_at', '').isoformat() if bot.get('started_at') else '',
+                    "stopped_at": bot.get('stopped_at', '').isoformat() if bot.get('stopped_at') else ''
+                })
+            
+            return result
+            
+        except Exception as e:
+            print(f"Error getting all bots: {e}")
+            return []
     
     def delete_bot(self, bot_id: str) -> bool:
-        if bot_id not in self.active_bots:
+        try:
+            bot = self.bots_collection.find_one({"_id": ObjectId(bot_id)})
+            
+            if not bot:
+                return False
+            
+            if bot.get('status') == 'RUNNING':
+                self.stop_bot(bot_id)
+            
+            self.bots_collection.delete_one({"_id": ObjectId(bot_id)})
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error deleting bot: {e}")
             return False
-        
-        self.stop_bot(bot_id)
-        del self.active_bots[bot_id]
-        return True

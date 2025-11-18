@@ -1,0 +1,14 @@
+{
+  "open_trades": [
+    {
+      "qty": 0.05,
+      "target_price": 94720.42929999999,
+      "buy_order_id": null,
+      "buy_fill_price": 93320.62,
+      "buy_fee_usdt": 2.7996185999999996,
+      "created_at": "2025-11-18T20:01:05.412969"
+    }
+  ],
+  "total_realized_pnl": 0.0,
+  "last_updated": "2025-11-18T20:01:05.413606"
+}

@@ -79,23 +79,26 @@ class BitunixClient:
         return []
     
     def place_order(
-        self,
-        symbol: str,
-        side: str,
-        qty: float,
-        order_type: str = 'MARKET',
-        trade_side: str = None,
-        position_id: str = None,
-        reduce_only: bool = False
-    ):
+    self,
+    symbol: str,
+    side: str,
+    qty: float,
+    order_type: str = 'MARKET',
+    trade_side: str = None,
+    position_id: str = None,
+    reduce_only: bool = False
+):
         self.logger.info(f"{side} ORDER: {qty} {symbol}")
         
         try:
+            side_int = 1 if side.upper() == 'BUY' else 2
+            order_type_int = 1 if order_type.upper() == 'MARKET' else 2
+            
             result = self.api.place_order(
-                symbol=symbol,
-                side=side.lower(),
-                order_type=order_type.lower(),
-                quantity=str(qty)
+                side=side_int,
+                order_type=order_type_int,
+                volume=str(qty),
+                symbol=symbol
             )
             
             if result and str(result.get('code')) == '0':
