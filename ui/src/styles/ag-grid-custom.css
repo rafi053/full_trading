@@ -1,0 +1,24 @@
+.ag-theme-alpine-dark {
+  --ag-background-color: #131824;
+  --ag-header-background-color: #0a0e1a;
+  --ag-odd-row-background-color: #131824;
+  --ag-row-hover-color: #1e2538;
+  --ag-border-color: #1e2538;
+  --ag-header-foreground-color: #9ca3af;
+  --ag-foreground-color: #ffffff;
+  --ag-selected-row-background-color: #1e3a5f;
+}
+
+.ag-theme-alpine-dark .ag-header {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ag-theme-alpine-dark .ag-row {
+  border-bottom: 1px solid #1e2538;
+}
+
+.ag-theme-alpine-dark .ag-cell {
+  display: flex;
+  align-items: center;
+}
