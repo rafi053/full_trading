@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from trading_bots.api.routes import balance_routes
+
 
 from market_signal_service.api.routes import signal_routes
 from trading_bots.api.routes import bot_routes
@@ -29,6 +31,13 @@ app.include_router(
     tags=["Trading Bots"]
 )
 
+app.include_router(
+    balance_routes.router,
+    prefix="/api",
+    tags=["Balance"]
+)
+
+
 @app.get("/")
 async def root():
     return {
@@ -37,6 +46,7 @@ async def root():
         "services": {
             "signal": "/api/signal",
             "bots": "/api/bots",
+            "balances": "/api/balances",
             "docs": "/docs",
             "health": "/health"
         }
@@ -48,7 +58,8 @@ async def health_check():
         "status": "healthy",
         "services": {
             "signals": "active",
-            "bots": "active"
+            "bots": "active",
+            "balances": "active"
         }
     }
 

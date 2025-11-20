@@ -1,9 +1,13 @@
-import apiClient from './client';
-import { Bot, BotCreateInput, BotWithStats, BotStats, ApiResponse, PaginatedResponse } from '@/types/api';
+import apiClient from "./client";
+import { Bot, BotCreateInput, BotWithStats, BotStats } from "@/types/api";
 
 export const botsApi = {
-  getAll: async (params?: { page?: number; limit?: number; status?: string }): Promise<PaginatedResponse<BotWithStats>> => {
-    const response = await apiClient.get('/api/bots', { params });
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+  }): Promise<BotWithStats[]> => {
+    const response = await apiClient.get("/api/bots", { params });
     return response.data;
   },
 
@@ -13,7 +17,7 @@ export const botsApi = {
   },
 
   create: async (data: BotCreateInput): Promise<Bot> => {
-    const response = await apiClient.post('/api/bots', data);
+    const response = await apiClient.post("/api/bots", data);
     return response.data;
   },
 
@@ -42,7 +46,7 @@ export const botsApi = {
   },
 
   getCount: async (params?: { status?: string }): Promise<number> => {
-    const response = await apiClient.get('/api/bots/count', { params });
+    const response = await apiClient.get("/api/bots/count", { params });
     return response.data;
   },
 };

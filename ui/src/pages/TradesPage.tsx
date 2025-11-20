@@ -1,12 +1,12 @@
-import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Layout } from '@/components/layout/Layout';
-import { Loading } from '@/components/ui/Loading';
-import { useTrades } from '@/hooks/useData';
-import { format } from 'date-fns';
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { AgGridReact } from "ag-grid-react";
+import { Layout } from "@/components/layout/Layout";
+import { Loading } from "@/components/ui/Loading";
+import { useTrades } from "@/hooks/useData";
+import { format } from "date-fns";
+import { Trade } from "@/types/api";
+import { ColDef } from "ag-grid-community";
 
 export const TradesPage = () => {
   const { t } = useTranslation();
@@ -14,29 +14,30 @@ export const TradesPage = () => {
 
   const columnDefs = [
     {
-      field: 'timestamp',
-      headerName: t('trades.time'),
+      field: "timestamp",
+      headerName: t("trades.time"),
       width: 180,
-      cellRenderer: (params: any) => format(new Date(params.value), 'MMM dd, HH:mm:ss'),
+      cellRenderer: (params: any) =>
+        format(new Date(params.value), "MMM dd, HH:mm:ss"),
     },
     {
-      field: 'symbol',
-      headerName: t('trades.symbol'),
+      field: "symbol",
+      headerName: t("trades.symbol"),
       width: 140,
       cellRenderer: (params: any) => (
         <span className="font-semibold text-white">{params.value}</span>
       ),
     },
     {
-      field: 'side',
-      headerName: t('trades.side'),
+      field: "side",
+      headerName: t("trades.side"),
       width: 100,
       cellRenderer: (params: any) => (
         <span
           className={
-            params.value === 'BUY'
-              ? 'text-green-400 font-semibold'
-              : 'text-red-400 font-semibold'
+            params.value === "BUY"
+              ? "text-green-400 font-semibold"
+              : "text-red-400 font-semibold"
           }
         >
           {params.value}
@@ -44,43 +45,49 @@ export const TradesPage = () => {
       ),
     },
     {
-      field: 'type',
-      headerName: t('trades.type'),
+      field: "type",
+      headerName: t("trades.type"),
       width: 100,
     },
     {
-      field: 'price',
-      headerName: t('trades.price'),
+      field: "price",
+      headerName: t("trades.price"),
       width: 140,
       cellRenderer: (params: any) => `$${params.value.toFixed(2)}`,
     },
     {
-      field: 'amount',
-      headerName: t('trades.amount'),
+      field: "amount",
+      headerName: t("trades.amount"),
       width: 140,
       cellRenderer: (params: any) => params.value.toFixed(6),
     },
     {
-      field: 'total',
-      headerName: t('trades.total'),
+      field: "total",
+      headerName: t("trades.total"),
       width: 140,
       cellRenderer: (params: any) => `$${params.value.toFixed(2)}`,
     },
     {
-      field: 'fee',
-      headerName: t('trades.fee'),
+      field: "fee",
+      headerName: t("trades.fee"),
       width: 100,
       cellRenderer: (params: any) => `$${params.value.toFixed(2)}`,
     },
     {
-      field: 'pnl',
-      headerName: t('trades.pnl'),
+      field: "pnl",
+      headerName: t("trades.pnl"),
       width: 130,
       cellRenderer: (params: any) => {
-        if (!params.value) return '-';
+        if (!params.value) return "-";
         const pnl = params.value;
         return (
-          <span className={pnl >= 0 ? 'text-green-400 font-semibold' : 'text-red-400 font-semibold'}>
+          <span
+            className={
+              pnl >= 0
+                ? "text-green-400 font-semibold"
+                : "text-red-400 font-semibold"
+            }
+          >
             ${pnl.toFixed(2)}
           </span>
         );
@@ -104,7 +111,7 @@ export const TradesPage = () => {
           animate={{ opacity: 1, x: 0 }}
           className="text-3xl font-bold"
         >
-          {t('trades.title')}
+          {t("trades.title")}
         </motion.h1>
 
         {tradesData?.data && tradesData.data.length > 0 ? (
@@ -113,9 +120,9 @@ export const TradesPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="ag-theme-alpine-dark h-[600px] rounded-xl overflow-hidden border border-[#1e2538]"
           >
-            <AgGridReact
+            <AgGridReact<Trade>
               rowData={tradesData.data}
-              columnDefs={columnDefs}
+              columnDefs={columnDefs as ColDef<Trade>[]}
               defaultColDef={{
                 sortable: true,
                 filter: true,

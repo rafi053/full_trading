@@ -47,6 +47,21 @@
     "starting": "Starting",
     "stopping": "Stopping"
   },
+  "deleteBot": {
+    "title": "Delete Bot",
+    "warning": "This action cannot be undone!",
+    "runningWarningTitle": "Bot is currently running!",
+    "runningWarningMessage": "You must stop the bot before you can delete it.",
+    "botDetails": "Bot Details",
+    "name": "Name",
+    "type": "Type",
+    "exchange": "Exchange",
+    "symbol": "Symbol",
+    "status": "Status",
+    "confirmMessage": "Are you sure you want to delete",
+    "cancel": "Cancel",
+    "confirmButton": "Delete Bot"
+  },
   "botForm": {
     "create": "Create Trading Bot",
     "edit": "Edit Trading Bot",
@@ -73,7 +88,8 @@
     "locked": "In Orders",
     "total": "Total",
     "usdValue": "USD Value",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "noBalances": "No balances available"
   },
   "positions": {
     "title": "Open Positions",

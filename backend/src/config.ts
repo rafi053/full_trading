@@ -12,6 +12,7 @@ export const config = {
     },
     bots: {
         botsCollectionName: env.get('BOTS_COLLECTION').required().asString(),
+        botsStatsCollectionName: env.get('BOTS_STATS_COLLECTION').required().asString(),
     },
     trades: {
         tradesCollectionName: env.get('TRADES_COLLECTION').required().asString(),

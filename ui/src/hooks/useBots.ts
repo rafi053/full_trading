@@ -1,11 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { botsApi } from '@/api/bots';
-import { BotCreateInput } from '@/types/api';
-import { toast } from 'react-toastify';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { botsApi } from "@/api/bots";
+import { BotCreateInput } from "@/types/api";
+import { toast } from "react-toastify";
+import { useToast } from "./useToast";
 
-export const BOTS_QUERY_KEY = 'bots';
+export const BOTS_QUERY_KEY = "bots";
 
-export const useBots = (params?: { page?: number; limit?: number; status?: string }) => {
+export const useBots = (params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+}) => {
   return useQuery({
     queryKey: [BOTS_QUERY_KEY, params],
     queryFn: () => botsApi.getAll(params),
@@ -24,7 +29,7 @@ export const useBot = (id: string) => {
 
 export const useBotStats = (id: string) => {
   return useQuery({
-    queryKey: [BOTS_QUERY_KEY, id, 'stats'],
+    queryKey: [BOTS_QUERY_KEY, id, "stats"],
     queryFn: () => botsApi.getStats(id),
     enabled: !!id,
     refetchInterval: 5000,
@@ -38,10 +43,10 @@ export const useCreateBot = () => {
     mutationFn: (data: BotCreateInput) => botsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [BOTS_QUERY_KEY] });
-      toast.success('Bot created successfully!');
+      toast.success("Bot created successfully!");
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to create bot');
+      toast.error(error.message || "Failed to create bot");
     },
   });
 };
@@ -55,25 +60,28 @@ export const useUpdateBot = () => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: [BOTS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [BOTS_QUERY_KEY, id] });
-      toast.success('Bot updated successfully!');
+      toast.success("Bot updated successfully!");
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to update bot');
+      toast.error(error.message || "Failed to update bot");
     },
   });
 };
 
 export const useDeleteBot = () => {
   const queryClient = useQueryClient();
+  const { success, error } = useToast();
 
   return useMutation({
     mutationFn: (id: string) => botsApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [BOTS_QUERY_KEY] });
-      toast.success('Bot deleted successfully!');
+      success("Bot deleted successfully!");
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete bot');
+    onError: (err: any) => {
+      const message =
+        err.response?.data?.message || err.message || "Failed to delete bot";
+      error(message);
     },
   });
 };
@@ -86,10 +94,10 @@ export const useStartBot = () => {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: [BOTS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [BOTS_QUERY_KEY, id] });
-      toast.success('Bot started successfully!');
+      toast.success("Bot started successfully!");
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to start bot');
+      toast.error(error.message || "Failed to start bot");
     },
   });
 };
@@ -102,10 +110,10 @@ export const useStopBot = () => {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: [BOTS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [BOTS_QUERY_KEY, id] });
-      toast.success('Bot stopped successfully!');
+      toast.success("Bot stopped successfully!");
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to stop bot');
+      toast.error(error.message || "Failed to stop bot");
     },
   });
 };

@@ -113,5 +113,5 @@ const BotStatsSchema = new Schema<BotStatsDocument>(
     },
 );
 
-export const BotModel = mongoose.model<BotDocument>('Bot', BotSchema);
-export const BotStatsModel = mongoose.model<BotStatsDocument>(config.bots.botsCollectionName, BotStatsSchema);
+export const BotModel = mongoose.model<BotDocument>(config.bots.botsCollectionName, BotSchema);
+export const BotStatsModel = mongoose.model<BotStatsDocument>(config.bots.botsStatsCollectionName, BotStatsSchema);

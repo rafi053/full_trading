@@ -1,17 +1,24 @@
 .ag-theme-alpine-dark {
   --ag-background-color: #131824;
-  --ag-header-background-color: #0a0e1a;
+  --ag-header-background-color: #1e2538;
   --ag-odd-row-background-color: #131824;
   --ag-row-hover-color: #1e2538;
+  --ag-selected-row-background-color: #2563eb;
   --ag-border-color: #1e2538;
-  --ag-header-foreground-color: #9ca3af;
+  --ag-header-foreground-color: #ffffff;
   --ag-foreground-color: #ffffff;
-  --ag-selected-row-background-color: #1e3a5f;
+  --ag-secondary-foreground-color: #9ca3af;
+  --ag-data-color: #ffffff;
+  --ag-cell-horizontal-border: none;
+  --ag-row-border-color: #1e2538;
+}
+
+.ag-theme-alpine-dark .ag-root-wrapper {
+  border: none;
 }
 
 .ag-theme-alpine-dark .ag-header {
-  font-weight: 600;
-  font-size: 14px;
+  border-bottom: 1px solid #1e2538;
 }
 
 .ag-theme-alpine-dark .ag-row {
@@ -19,6 +26,12 @@
 }
 
 .ag-theme-alpine-dark .ag-cell {
-  display: flex;
-  align-items: center;
+  line-height: 60px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.ag-theme-alpine-dark .ag-header-cell {
+  padding-left: 16px;
+  padding-right: 16px;
 }

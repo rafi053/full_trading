@@ -3,8 +3,6 @@ import { config } from '../config';
 
 const PYTHON_SERVICE_URL = config.python.url;
 
-console.log('🔗 Python Service URL:', PYTHON_SERVICE_URL);
-
 export class PythonBotService {
     static async startBot(botId: string): Promise<any> {
         try {
