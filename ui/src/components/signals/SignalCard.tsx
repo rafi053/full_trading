@@ -4,15 +4,17 @@ import {
   ArrowTrendingDownIcon,
   MinusIcon,
   ClockIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import { format } from "date-fns";
 
 interface SignalCardProps {
   signal: any;
   onClick?: () => void;
+  onDelete?: () => void;
 }
 
-export const SignalCard = ({ signal, onClick }: SignalCardProps) => {
+export const SignalCard = ({ signal, onClick, onDelete }: SignalCardProps) => {
   const getSignalColor = (signalType: string) => {
     switch (signalType.toUpperCase()) {
       case "BUY":
@@ -41,31 +43,47 @@ export const SignalCard = ({ signal, onClick }: SignalCardProps) => {
     return "text-gray-400";
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete();
+    }
+  };
+
   return (
     <motion.div
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="bg-[#131824] border border-[#1e2538] rounded-xl p-5 cursor-pointer hover:border-blue-500/30 transition-all"
+      className="bg-[#131824] border border-[#1e2538] rounded-xl p-5 cursor-pointer hover:border-blue-500/30 transition-all relative group"
     >
       <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-white mb-1">
-            {signal.symbol}
-          </h3>
+        <div className="flex-1">
+          <h3 className="text-lg font-bold text-white mb-1">{signal.symbol}</h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span className="uppercase">{signal.exchange}</span>
             <span>•</span>
             <span className="uppercase">{signal.timeframe}</span>
           </div>
         </div>
-        <div
-          className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 ${getSignalColor(
-            signal.signal
-          )}`}
-        >
-          {getSignalIcon(signal.signal)}
-          <span className="font-bold text-sm">{signal.signal}</span>
+        <div className="flex items-center gap-2">
+          <div
+            className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 ${getSignalColor(
+              signal.signal
+            )}`}
+          >
+            {getSignalIcon(signal.signal)}
+            <span className="font-bold text-sm">{signal.signal}</span>
+          </div>
+          {onDelete && (
+            <button
+              onClick={handleDelete}
+              className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+              title="Delete analysis"
+            >
+              <TrashIcon className="w-4 h-4 text-red-400" />
+            </button>
+          )}
         </div>
       </div>
 

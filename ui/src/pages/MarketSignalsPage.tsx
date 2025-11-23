@@ -32,6 +32,13 @@ export const MarketSignalsPage = () => {
     setIsFormModalOpen(false);
   };
 
+  const handleDeleteSignal = (signalId: string) => {
+    setLatestSignals((prev) => prev.filter((signal) => signal.id !== signalId));
+    if (selectedSignal?.id === signalId) {
+      setSelectedSignal(null);
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-8">
@@ -128,6 +135,7 @@ export const MarketSignalsPage = () => {
                   key={signal.id || index}
                   signal={signal}
                   onClick={() => setSelectedSignal(signal)}
+                  onDelete={() => handleDeleteSignal(signal.id)}
                 />
               ))}
             </div>

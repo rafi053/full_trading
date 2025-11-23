@@ -1,6 +1,7 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { SignalRequest } from "@/types/signal-types";
+import SymbolSelector from "@/data/SymbolSelector";
 
 interface SignalFormProps {
   onSubmit: (data: SignalRequest) => void;
@@ -14,11 +15,13 @@ export const SignalForm = ({
   loading,
 }: SignalFormProps) => {
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<SignalRequest>({
     defaultValues: {
+      symbol: "BTCUSDT",
       exchange: "binance",
       timeframe: "1h",
       limit: 300,
@@ -28,24 +31,21 @@ export const SignalForm = ({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Symbol
-        </label>
-        <input
-          {...register("symbol", {
+        <Controller
+          name="symbol"
+          control={control}
+          rules={{
             required: "Symbol is required",
-            pattern: {
-              value: /^[A-Z]+$/,
-              message: "Invalid symbol format",
-            },
-          })}
-          type="text"
-          placeholder="BTCUSDT"
-          className="w-full bg-[#1a1f2e] border border-[#2a3142] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+          }}
+          render={({ field }) => (
+            <SymbolSelector
+              value={field.value}
+              onChange={(e) => field.onChange(e.target.value)}
+              error={errors.symbol?.message}
+              availableBalance={null}
+            />
+          )}
         />
-        {errors.symbol && (
-          <p className="text-red-400 text-sm mt-1">{errors.symbol.message}</p>
-        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
